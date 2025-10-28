@@ -18,14 +18,15 @@ public class SecurityConfig {
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
-                .httpBasic(Customizer.withDefaults())
                 .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(HttpMethod.GET, "/api/users/**").hasAnyRole("ADMIN", "USER")
-                        .requestMatchers(HttpMethod.POST, "/api/users/**").hasRole("ADMIN")
-                        .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasRole("ADMIN")
-                        .anyRequest().authenticated()
-                ).build();
+                                .requestMatchers(HttpMethod.GET, "/api/users/**").hasAnyRole("ADMIN", "USER")
+                                .requestMatchers(HttpMethod.POST, "/api/users/**").hasRole("ADMIN")
+                                .requestMatchers(HttpMethod.DELETE, "/api/users/**").hasRole("ADMIN")
+                                .anyRequest().authenticated()
+                )
+                .httpBasic(Customizer.withDefaults())
+                .build();
     }
 
 /*    @Bean
