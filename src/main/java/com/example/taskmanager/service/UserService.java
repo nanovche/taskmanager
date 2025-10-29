@@ -1,15 +1,19 @@
 package com.example.taskmanager.service;
 
 import com.example.taskmanager.dto.User;
+import com.example.taskmanager.exception.UserAlreadyExistsException;
+import com.example.taskmanager.exception.WeakPasswordException;
 import com.example.taskmanager.repository.UserRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -28,10 +32,17 @@ public class UserService {
         this.passwordEncoder = passwordEncoder;
     }
 
-    public User fetchUser(String username) {
-        if (StringUtils.isEmpty(username)) {
+    public User fetchUser(Long userId) {
+
+        if (userId == null) {
+            throw new IllegalArgumentException("userid is null");
+        }
+
+        String username = userRepository.findUsernameById(userId);
+        if(StringUtils.isEmpty(username)){
             throw new IllegalArgumentException("username is empty or null");
         }
+
         UserDetails user = jdbcUserDetailsManager.loadUserByUsername(username);
         String[] strs = user.getAuthorities().stream()
                 .map(GrantedAuthority::getAuthority)
@@ -50,16 +61,36 @@ public class UserService {
             throw new IllegalArgumentException("no authorities data");
         }
 
-        //CHECK PASSWORD STRENGTH
-        //CHECK USERNAME DOES NOT EXIST
-        //DO WITH .PASSWORDENCODER
-        UserDetails springUser = org.springframework.security.core.userdetails.User
-                .withUsername(dtoUser.getUsername())
-                .password(dtoUser.getPassword())
-                .authorities(Arrays.stream(dtoUser.getAuthorities()).map(SimpleGrantedAuthority::new).collect(Collectors.toList()))
-                .build();
+        if(jdbcUserDetailsManager.userExists(dtoUser.getUsername())) {
+            throw new UserAlreadyExistsException(String.format("User %s already exists", dtoUser.getUsername()));
+        } else {
+            if(checkPasswordStrength(dtoUser.getPassword())) {
+                UserDetails newUser = org.springframework.security.core.userdetails.User
+                        .withUsername(dtoUser.getUsername())
+                        .password(passwordEncoder.encode(dtoUser.getPassword()))
+                        .authorities(Arrays.stream(dtoUser.getAuthorities()).map(SimpleGrantedAuthority::new).collect(Collectors.toList()))
+                        .build();
 
-        jdbcUserDetailsManager.createUser(springUser);
+                jdbcUserDetailsManager.createUser(newUser);
+
+            } else {
+                throw new WeakPasswordException("weak password");
+            }
+        }
+    }
+
+    public void changePassword(String newPassword, String username){
+
+        if (StringUtils.isEmpty(newPassword) || StringUtils.isEmpty(username)) {
+            throw new IllegalArgumentException("insufficient data");
+        }
+
+        if(checkPasswordStrength(newPassword)){
+//            jdbcUserDetailsManager.changePassword();
+//            userRepository.updateUserPassword(newPassword, username);
+        } else {
+            throw new WeakPasswordException("weak password");
+        }
     }
 
     public void updateUser(User userDto) {
@@ -97,5 +128,9 @@ public class UserService {
         }
 
         jdbcUserDetailsManager.deleteUser(username);
+    }
+
+    private boolean checkPasswordStrength(String password){
+        return true;
     }
 }
