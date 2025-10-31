@@ -1,19 +1,19 @@
 package com.example.taskmanager.service;
 
 import com.example.taskmanager.dto.User;
+import com.example.taskmanager.exception.UserCreationException;
 import com.example.taskmanager.exception.UserAlreadyExistsException;
 import com.example.taskmanager.exception.WeakPasswordException;
 import com.example.taskmanager.repository.UserRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.stream.Collectors;
@@ -51,7 +51,7 @@ public class UserService {
         return new User(user.getUsername(), user.getPassword(), strs);
     }
 
-    public void createUser(User dtoUser) {
+    public User createUser(User dtoUser) {
 
         if (dtoUser == null || StringUtils.isEmpty(dtoUser.getUsername()) || StringUtils.isEmpty(dtoUser.getPassword())) {
             throw new IllegalArgumentException("insufficient user data");
@@ -71,8 +71,12 @@ public class UserService {
                         .authorities(Arrays.stream(dtoUser.getAuthorities()).map(SimpleGrantedAuthority::new).collect(Collectors.toList()))
                         .build();
 
-                jdbcUserDetailsManager.createUser(newUser);
-
+                try {
+                    jdbcUserDetailsManager.createUser(newUser);
+                } catch (DataAccessException ex) {
+                    throw new UserCreationException("failed to create user", ex);
+                }
+                return dtoUser;
             } else {
                 throw new WeakPasswordException("weak password");
             }
