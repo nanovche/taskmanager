@@ -15,6 +15,14 @@ public final class SecurityUser implements UserDetails {
         this.user = user;
     }
 
+    public Long getId() {
+        return user.getId();
+    }
+
+    public void setId(Long id) {
+        user.setId(id);
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of(user::getAuthority);
