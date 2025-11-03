@@ -39,10 +39,11 @@ public class UserController {
         return ResponseEntity.ok(200);
     }
 
+    /* when replace jdbc manager with jpa repo -> return obj with id from repo and add id to .created(uri) */
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> createUser(@RequestBody User user){
-        userService.createUser(user);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<User> createUser(@RequestBody User user){
+        User userCreated = userService.createUser(user);
+        return ResponseEntity.ok(userCreated);
 //        return ResponseEntity.created(201);
     }
 
