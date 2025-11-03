@@ -1,6 +1,8 @@
 package com.example.taskmanager.service;
 
+import com.example.taskmanager.domain.SecurityUser;
 import com.example.taskmanager.dto.User;
+import com.example.taskmanager.exception.NoSuchUserException;
 import com.example.taskmanager.exception.UserCreationException;
 import com.example.taskmanager.exception.UserAlreadyExistsException;
 import com.example.taskmanager.exception.WeakPasswordException;
@@ -48,7 +50,7 @@ public class UserService {
                 .map(GrantedAuthority::getAuthority)
                 .toList().toArray(new String[0]);
 
-        return new User(user.getUsername(), user.getPassword(), strs);
+        return new User(1L, user.getUsername(), user.getPassword(), strs);
     }
 
     public User createUser(User dtoUser) {
@@ -126,11 +128,13 @@ public class UserService {
         if (userId == null) {
             throw new IllegalArgumentException("userId is null");
         }
-        String username = userRepository.findUsernameById(userId);
-        if(StringUtils.isEmpty(username)){
-            throw new IllegalArgumentException("username is empty or null");
-        }
 
+        String username;
+        try {
+            username = userRepository.findUsernameById(userId);
+        } catch (DataAccessException ex) {
+            throw new NoSuchUserException(String.format("user with id %s does not exist - no user is deleted", userId), ex);
+        }
         jdbcUserDetailsManager.deleteUser(username);
     }
 
