@@ -29,7 +29,7 @@ public class UserController {
     }
 
     @GetMapping(value = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> getUser(@PathVariable("userId") Long userId){;
+    public ResponseEntity<User> getUser(@PathVariable("userId") Long userId){;
         return ResponseEntity.ok(userService.fetchUser(userId));
     }
 

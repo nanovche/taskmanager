@@ -1,6 +1,5 @@
 package com.example.taskmanager.service;
 
-import com.example.taskmanager.domain.SecurityUser;
 import com.example.taskmanager.dto.User;
 import com.example.taskmanager.exception.NoSuchUserException;
 import com.example.taskmanager.exception.UserCreationException;
@@ -10,7 +9,6 @@ import com.example.taskmanager.repository.UserRepository;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -39,18 +37,13 @@ public class UserService {
         if (userId == null) {
             throw new IllegalArgumentException("userid is null");
         }
-
-        String username = userRepository.findUsernameById(userId);
-        if(StringUtils.isEmpty(username)){
-            throw new IllegalArgumentException("username is empty or null");
+        User user;
+        try {
+            user = userRepository.fetchUserById(userId);
+        } catch (DataAccessException ex) {
+            throw new NoSuchUserException(String.format("user with id %s does not exist", userId), ex);
         }
-
-        UserDetails user = jdbcUserDetailsManager.loadUserByUsername(username);
-        String[] strs = user.getAuthorities().stream()
-                .map(GrantedAuthority::getAuthority)
-                .toList().toArray(new String[0]);
-
-        return new User(1L, user.getUsername(), user.getPassword(), strs);
+        return user;
     }
 
     public User createUser(User dtoUser) {
@@ -131,7 +124,7 @@ public class UserService {
 
         String username;
         try {
-            username = userRepository.findUsernameById(userId);
+            username = userRepository.fetchUsernameById(userId);
         } catch (DataAccessException ex) {
             throw new NoSuchUserException(String.format("user with id %s does not exist - no user is deleted", userId), ex);
         }
