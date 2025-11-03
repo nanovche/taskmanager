@@ -46,8 +46,8 @@ public class UserController {
 //        return ResponseEntity.created(201);
     }
 
-    @DeleteMapping(value = "/{userId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<?> deleteUser(@PathVariable("userId") Long userId){
+    @DeleteMapping(value = "/{userId}")
+    public ResponseEntity<Void> deleteUser(@PathVariable("userId") Long userId){
         userService.deleteUser(userId);
         return ResponseEntity.noContent().build();
     }
