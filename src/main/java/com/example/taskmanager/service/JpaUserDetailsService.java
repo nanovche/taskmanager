@@ -1,7 +1,7 @@
 package com.example.taskmanager.service;
 
 import com.example.taskmanager.domain.SecurityUser;
-import com.example.taskmanager.entity.User;
+import com.example.taskmanager.entity.UserEntity;
 import com.example.taskmanager.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -22,7 +22,7 @@ public class JpaUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
 
-        User entityUser = userRepository.findByUsername(username)
+        UserEntity entityUser = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException(String.format("user %s not found", username)));
 
         return new SecurityUser(entityUser);
