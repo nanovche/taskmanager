@@ -1,17 +1,17 @@
 package com.example.taskmanager.domain;
 
-import com.example.taskmanager.entity.User;
+import com.example.taskmanager.entity.UserEntity;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
-import java.util.List;
 
 public final class SecurityUser implements UserDetails {
 
-    private final User user;
+    private final UserEntity user;
 
-    public SecurityUser(User user) {
+    public SecurityUser(UserEntity user) {
         this.user = user;
     }
 
@@ -19,13 +19,11 @@ public final class SecurityUser implements UserDetails {
         return user.getId();
     }
 
-    public void setId(Long id) {
-        user.setId(id);
-    }
-
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        return List.of(user::getAuthority);
+        return user.getAuthorities().stream()
+                .map(a -> new SimpleGrantedAuthority(a.getName()))
+                .toList();
     }
 
     @Override

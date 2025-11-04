@@ -2,18 +2,15 @@ package com.example.taskmanager.controller;
 
 import com.example.taskmanager.dto.UserDTO;
 import com.example.taskmanager.exception.ApiErrorCode;
-import com.example.taskmanager.exception.NoSuchUserException;
-import com.example.taskmanager.exception.UserAlreadyExistsException;
 import com.example.taskmanager.exception.UserCreationException;
+import com.example.taskmanager.exception.UserAlreadyExistsException;
 import com.example.taskmanager.service.UserService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.net.URI;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -29,51 +26,57 @@ public class UserController {
         this.userService = userService;
     }
 
-    @GetMapping(value = "/{userId}", produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserDTO> getUser(@PathVariable("userId") Long userId){;
+    //or throw not found 404
+    @GetMapping("/{userId}")
+    public ResponseEntity<?> getUser(@PathVariable("userId") Long userId){
         return ResponseEntity.ok(userService.fetchUser(userId));
     }
 
-    /* when replace jdbc manager with jpa repo -> return obj with id from repo and add id to .created(uri) */
-    @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
-    public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO user){
-        UserDTO userCreated = userService.createUser(user);
-        return ResponseEntity.created(URI.create(String.format("/api/users/%s", userCreated.getId()))).body(userCreated);
+    @PutMapping("/{userId}/changePassword")
+    public ResponseEntity<?> updateUserPassword(@RequestBody UserDTO user){
+        userService.changePassword(user.getPassword(), user.getUsername());
+        return ResponseEntity.ok(200);
     }
 
-    @DeleteMapping(value = "/{userId}")
-    public ResponseEntity<Void> deleteUser(@PathVariable("userId") Long userId){
+    @PostMapping
+    public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO user){
+        UserDTO created = userService.createUser(user);
+//        URI location = URI.create("/api/users/" + created.getId());
+        return ResponseEntity.ok(created);
+    }
+
+    @DeleteMapping("/{userId}")
+    public void deleteUser(@PathVariable("userId") Long userId){
         userService.deleteUser(userId);
-        return ResponseEntity.noContent().build();
     }
 
     @ExceptionHandler(UserAlreadyExistsException.class)
     public ResponseEntity<Map<String, String>> handleUserExists(UserAlreadyExistsException ex, HttpServletRequest request) {
         Map<String, String> body = new HashMap<>();
         body.put("timestamp", new Date().toString());
-        body.put("error", ApiErrorCode.USER_ALREADY_EXISTS.name());
+        body.put("error", ApiErrorCode.USER_ALREADY_EXISTS.toString());
         body.put("message", ex.getMessage());
         body.put("path", request.getRequestURI());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
     }
 
     @ExceptionHandler(UserCreationException.class)
-    public ResponseEntity<Map<String, String>> handleUserCreation(UserCreationException ex, HttpServletRequest request) {
+    public ResponseEntity<Map<String, String>> handleUserCreationFailure(UserCreationException ex, HttpServletRequest request) {
         Map<String, String> body = new HashMap<>();
         body.put("timestamp", new Date().toString());
-        body.put("error", ApiErrorCode.USER_CREATION_FAILED.name());
+        body.put("error", ApiErrorCode.USER_CREATION_FAILED.toString());
         body.put("message", ex.getMessage());
         body.put("path", request.getRequestURI());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
 
-    @ExceptionHandler(NoSuchUserException.class)
+/*    @ExceptionHandler(NoSuchUserException.class)
     public ResponseEntity<Map<String, String>> handleNoSuchUser(NoSuchUserException ex, HttpServletRequest request) {
         Map<String, String> body = new HashMap<>();
         body.put("timestamp", new Date().toString());
-        body.put("error", ApiErrorCode.NO_SUCH_USER.name());
+        body.put("error", ApiErrorCode.NO_SUCH_USER.toString());
         body.put("message", ex.getMessage());
         body.put("path", request.getRequestURI());
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
-    }
+    }*/
 }

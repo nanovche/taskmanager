@@ -9,8 +9,9 @@ import java.util.Set;
 
 @Entity
 @Getter
+@Setter
 @AllArgsConstructor
-@NoArgsConstructor(access = AccessLevel.PRIVATE, force = true)
+@NoArgsConstructor
 @Table(name = "users")
 public class UserEntity {
 
