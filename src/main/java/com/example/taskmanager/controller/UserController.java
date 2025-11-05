@@ -12,6 +12,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.Date;
@@ -38,7 +39,14 @@ public class UserController {
     @PostMapping(consumes = MediaType.APPLICATION_JSON_VALUE, produces = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<UserDTO> createUser(@RequestBody UserDTO user){
         UserDTO userCreated = userService.createUser(user);
-        return ResponseEntity.created(URI.create(String.format("/api/users/%s", userCreated.getId()))).body(userCreated);
+
+        URI location = ServletUriComponentsBuilder
+                .fromCurrentRequest()
+                .path("{/id}")
+                .buildAndExpand(userCreated.getId())
+                .toUri();
+
+        return ResponseEntity.created(location).body(userCreated);
     }
 
     @DeleteMapping(value = "/{userId}")
