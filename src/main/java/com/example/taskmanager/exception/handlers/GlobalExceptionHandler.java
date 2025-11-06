@@ -26,8 +26,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
     }
 
-    @ExceptionHandler(UserCreationException.class)
-    public ResponseEntity<Map<String, String>> handleUserCreation(UserCreationException ex, HttpServletRequest request) {
+    @ExceptionHandler(UserCreationFailedException.class)
+    public ResponseEntity<Map<String, String>> handleUserCreationException(UserCreationFailedException ex, HttpServletRequest request) {
         Map<String, String> body = new HashMap<>();
         body.put("timestamp", new Date().toString());
         body.put("error", ApiErrorCode.USER_CREATION_FAILED.name());
@@ -36,28 +36,11 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
 
-    @ExceptionHandler(NoSuchUserException.class)
-    public ResponseEntity<Map<String, String>> handleNoSuchUser(NoSuchUserException ex, HttpServletRequest request) {
-        Map<String, String> body = new HashMap<>();
-        body.put("timestamp", new Date().toString());
-        body.put("error", ApiErrorCode.NO_SUCH_USER.name());
-        body.put("message", ex.getMessage());
-        body.put("path", request.getRequestURI());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
-    }
-
-    @ExceptionHandler(RepositoryException.class)
-    public ResponseEntity<Map<String, String>> handleRepositoryException(RepositoryException ex, HttpServletRequest request) {
-        Map<String, String> body = new HashMap<>();
-        body.put("timestamp", new Date().toString());
-        body.put("error", ApiErrorCode.INTERNAL_SERVER_ERROR.name());
-        body.put("message", ex.getMessage());
-        body.put("path", request.getRequestURI());
-        return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
-    }
-
-    @ExceptionHandler(UserDeletionFailedException.class)
-    public ResponseEntity<Map<String, String>> handleUserDeletionFailedException(UserDeletionFailedException ex, HttpServletRequest request) {
+    @ExceptionHandler({
+            UserFetchingFailedException.class,
+            UserDeletionFailedException.class
+    })
+    public ResponseEntity<Map<String, String>> handleUserOperationException(RuntimeException ex, HttpServletRequest request) {
 
         Throwable cause = ex.getCause();
         Map<String, String> body = prepareCommonBodyData(cause, request);
