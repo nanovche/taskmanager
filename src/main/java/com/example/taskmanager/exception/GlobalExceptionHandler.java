@@ -10,6 +10,8 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
+import static com.example.taskmanager.exception.ApiErrorCode.UNKNOWN_ERROR;
+
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
@@ -51,5 +53,32 @@ public class GlobalExceptionHandler {
         body.put("message", ex.getMessage());
         body.put("path", request.getRequestURI());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
+    }
+
+    @ExceptionHandler(UserDeletionFailedException.class)
+    public ResponseEntity<Map<String, String>> handleUserDeletionFailedException(UserDeletionFailedException ex, HttpServletRequest request) {
+
+        Throwable cause = ex.getCause();
+        Map<String, String> body = prepareCommonBodyData(cause, request);
+        if (cause instanceof NoSuchUserException) {
+            body.put("error", ApiErrorCode.NO_SUCH_USER.name());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
+        } else if (cause instanceof RepositoryException) {
+            body.put("error", ApiErrorCode.INTERNAL_SERVER_ERROR.name());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
+        } else {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(Map.of(
+                    "error", UNKNOWN_ERROR.name()
+            ));
+        }
+    }
+
+    private Map<String, String> prepareCommonBodyData(Throwable ex, HttpServletRequest request){
+
+        Map<String, String> body = new HashMap<>();
+        body.put("timestamp", new Date().toString());
+        body.put("message", ex.getMessage());
+        body.put("path", request.getRequestURI());
+        return body;
     }
 }
