@@ -44,7 +44,7 @@ public class GlobalExceptionHandler {
 
         Throwable cause = ex.getCause();
         Map<String, String> body = prepareCommonBodyData(cause, request);
-        if (cause instanceof NoSuchUserException) {
+        if (cause instanceof UserNotFoundException) {
             body.put("error", ApiErrorCode.NO_SUCH_USER.name());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
         } else if (cause instanceof RepositoryException) {

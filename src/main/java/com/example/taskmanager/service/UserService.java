@@ -79,7 +79,7 @@ public class UserService {
 
         try {
             userRepository.deleteById(userId);
-        } catch (NoSuchUserException ex) {
+        } catch (UserNotFoundException ex) {
             throw new UserDeletionFailedException("Cannot delete: user not found (id=" + userId + ")", ex);
         } catch (RepositoryException ex) {
             throw new UserDeletionFailedException("Cannot delete: repository failure for user " + userId, ex);

@@ -1,7 +1,7 @@
 package com.example.taskmanager.repository;
 
 import com.example.taskmanager.entity.UserEntity;
-import com.example.taskmanager.exception.NoSuchUserException;
+import com.example.taskmanager.exception.UserNotFoundException;
 import com.example.taskmanager.exception.RepositoryException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
@@ -221,7 +221,7 @@ public class UserRepositoryAdapter implements UserRepository{
         try {
             userRepository.deleteById(userId);
         } catch (EmptyResultDataAccessException ex) {
-            throw new NoSuchUserException("User not found: " + userId, ex);
+            throw new UserNotFoundException("User not found: " + userId, ex);
         } catch (DataAccessException ex) {
             throw new RepositoryException("Failed to delete user " + userId, ex);
         }
