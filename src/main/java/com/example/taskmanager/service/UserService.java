@@ -31,9 +31,13 @@ public class UserService {
             throw new IllegalArgumentException("userid is null");
         }
 
-        return userRepository.findById(userId)
-                .map(userMapper::toDto)
-                .orElseThrow(() -> new NoSuchUserException(String.format("user with id %s does not exist", userId)));
+        try {
+            return userRepository.findById(userId)
+                    .map(userMapper::toDto)
+                    .orElseThrow(() -> new UserFetchingFailedException("Failed to fetch user: " + userId, new NoSuchUserException("User not found: " + userId)));
+        } catch (RepositoryException ex) {
+            throw new UserFetchingFailedException("Failed to fetch user " + userId, ex);
+        }
     }
 
     public UserDTO createUser(UserDTO dtoUser) {
@@ -58,7 +62,7 @@ public class UserService {
                 try {
                     user = userRepository.save(userEntity);
                 } catch (Exception e) {
-                    throw new UserCreationException("failed to create user", e);
+                    throw new UserCreationFailedException("failed to create user", e);
                 }
                 return userMapper.toDto(user);
             } else {

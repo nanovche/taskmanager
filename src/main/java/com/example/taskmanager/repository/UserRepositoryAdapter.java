@@ -185,12 +185,17 @@ public class UserRepositoryAdapter implements UserRepository{
     }
 
     /**
-     * @param aLong
+     * @param userId
      * @return
      */
     @Override
-    public Optional<UserEntity> findById(Long aLong) {
-        return Optional.empty();
+    public Optional<UserEntity> findById(Long userId) {
+
+        try {
+            return userRepository.findById(userId);
+        } catch (DataAccessException ex) {
+            throw new RepositoryException("Failed to fetch user " + userId, ex);
+        }
     }
 
 
