@@ -34,7 +34,7 @@ public class UserService {
         try {
             return userRepository.findById(userId)
                     .map(userMapper::toDto)
-                    .orElseThrow(() -> new UserFetchingFailedException("Failed to fetch user: " + userId, new NoSuchUserException("User not found: " + userId)));
+                    .orElseThrow(() -> new UserFetchingFailedException("Failed to fetch user: " + userId, new UserNotFoundException("User not found: " + userId)));
         } catch (RepositoryException ex) {
             throw new UserFetchingFailedException("Failed to fetch user " + userId, ex);
         }
@@ -61,12 +61,12 @@ public class UserService {
                 UserEntity user;
                 try {
                     user = userRepository.save(userEntity);
-                } catch (Exception e) {
-                    throw new UserCreationFailedException("failed to create user", e);
+                } catch (RepositoryException ex) {
+                    throw new UserCreationFailedException("failed to create user " + dtoUser.getUsername(), ex);
                 }
                 return userMapper.toDto(user);
             } else {
-                throw new WeakPasswordException("weak password");
+                throw new WeakPasswordException("weak password for " + dtoUser.getUsername());
             }
         }
     }
