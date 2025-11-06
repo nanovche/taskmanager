@@ -29,7 +29,7 @@ public class UserService {
     public UserDTO fetchUser(Long userId) {
 
         if (userId == null) {
-            throw new IllegalArgumentException("userid is null");
+            throw new ValidationException("userId is required");
         }
 
         try {
@@ -66,7 +66,7 @@ public class UserService {
     public void deleteUser(Long userId) {
 
         if (userId == null) {
-            throw new IllegalArgumentException("userId is null");
+            throw new ValidationException("userId is required");
         }
 
         try {

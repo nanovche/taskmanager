@@ -1,6 +1,7 @@
 package com.example.taskmanager.service;
 
 import com.example.taskmanager.dto.UserDTO;
+import com.example.taskmanager.exception.ValidationException;
 import org.apache.commons.lang3.StringUtils;
 import org.passay.*;
 import org.springframework.stereotype.Service;
@@ -13,13 +14,13 @@ public class ValidationService {
     void validateUserInput(UserDTO dtoUser) {
 
         if (dtoUser == null) {
-            throw new IllegalArgumentException("User DTO is null");
+            throw new ValidationException("user is required");
         }
         if (StringUtils.isEmpty(dtoUser.getUsername()) || StringUtils.isEmpty(dtoUser.getPassword())) {
-            throw new IllegalArgumentException("Missing username or password");
+            throw new ValidationException("Missing username or password");
         }
         if (dtoUser.getAuthorities() == null || dtoUser.getAuthorities().length == 0) {
-            throw new IllegalArgumentException("No authorities data");
+            throw new ValidationException("No authorities data");
         }
     }
 

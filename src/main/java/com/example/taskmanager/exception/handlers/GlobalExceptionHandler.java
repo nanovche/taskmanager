@@ -16,23 +16,24 @@ import static com.example.taskmanager.exception.ApiErrorCode.UNKNOWN_ERROR;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    @ExceptionHandler(ValidationException.class)
+    public ResponseEntity<Map<String, String>> handleValidationException(ValidationException ex, HttpServletRequest request) {
+        Map<String, String> body = prepareCommonBodyData(ex, request);
+        body.put("error", ApiErrorCode.BAD_REQUEST.name());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+    }
+
     @ExceptionHandler(UserAlreadyExistsException.class)
     public ResponseEntity<Map<String, String>> handleUserExists(UserAlreadyExistsException ex, HttpServletRequest request) {
-        Map<String, String> body = new HashMap<>();
-        body.put("timestamp", new Date().toString());
+        Map<String, String> body = prepareCommonBodyData(ex, request);
         body.put("error", ApiErrorCode.USER_ALREADY_EXISTS.name());
-        body.put("message", ex.getMessage());
-        body.put("path", request.getRequestURI());
         return ResponseEntity.status(HttpStatus.CONFLICT).body(body);
     }
 
     @ExceptionHandler(UserCreationFailedException.class)
     public ResponseEntity<Map<String, String>> handleUserCreationException(UserCreationFailedException ex, HttpServletRequest request) {
-        Map<String, String> body = new HashMap<>();
-        body.put("timestamp", new Date().toString());
+        Map<String, String> body = prepareCommonBodyData(ex,request);
         body.put("error", ApiErrorCode.USER_CREATION_FAILED.name());
-        body.put("message", ex.getMessage());
-        body.put("path", request.getRequestURI());
         return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(body);
     }
 
@@ -45,7 +46,7 @@ public class GlobalExceptionHandler {
         Throwable cause = ex.getCause();
         Map<String, String> body = prepareCommonBodyData(cause, request);
         if (cause instanceof UserNotFoundException) {
-            body.put("error", ApiErrorCode.NO_SUCH_USER.name());
+            body.put("error", ApiErrorCode.USER_NOT_FOUND.name());
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(body);
         } else if (cause instanceof RepositoryException) {
             body.put("error", ApiErrorCode.INTERNAL_SERVER_ERROR.name());
