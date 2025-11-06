@@ -5,23 +5,24 @@ import com.example.taskmanager.entity.UserEntity;
 import com.example.taskmanager.exception.*;
 import com.example.taskmanager.mappers.UserMapper;
 import com.example.taskmanager.repository.UserRepository;
-import org.apache.commons.lang3.StringUtils;
+import org.passay.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-
 
 @Service
 public class UserService {
 
     private final UserMapper userMapper;
     private final UserRepository userRepository;
+    private final ValidationService validationService;
     private final PasswordEncoder passwordEncoder;
 
     @Autowired
-    public UserService(UserMapper userMapper, UserRepository userRepository, PasswordEncoder passwordEncoder) {
+    public UserService(UserMapper userMapper, UserRepository userRepository, ValidationService validationService, PasswordEncoder passwordEncoder) {
         this.userMapper = userMapper;
         this.userRepository = userRepository;
+        this.validationService = validationService;
         this.passwordEncoder = passwordEncoder;
     }
 
@@ -42,33 +43,24 @@ public class UserService {
 
     public UserDTO createUser(UserDTO dtoUser) {
 
-        if (dtoUser == null || StringUtils.isEmpty(dtoUser.getUsername()) || StringUtils.isEmpty(dtoUser.getPassword())) {
-            throw new IllegalArgumentException("insufficient user data");
-        }
+        validationService.validateUserInput(dtoUser);
 
-        if (dtoUser.getAuthorities() == null || dtoUser.getAuthorities().length == 0) {
-            throw new IllegalArgumentException("no authorities data");
+        if(!validationService.checkPasswordStrength(dtoUser.getPassword())) {
+            throw new UserCreationFailedException(new WeakPasswordException("Weak Password: " + dtoUser.getUsername()));
         }
-
         if(userRepository.existsByUsername(dtoUser.getUsername())) {
-            throw new UserAlreadyExistsException(String.format("User %s already exists", dtoUser.getUsername()));
-        } else {
-            if(checkPasswordStrength(dtoUser.getPassword())) {
-
-                UserEntity userEntity = userMapper.toEntity(dtoUser);
-                userEntity.setPassword(passwordEncoder.encode(dtoUser.getPassword()));
-
-                UserEntity user;
-                try {
-                    user = userRepository.save(userEntity);
-                } catch (RepositoryException ex) {
-                    throw new UserCreationFailedException("failed to create user " + dtoUser.getUsername(), ex);
-                }
-                return userMapper.toDto(user);
-            } else {
-                throw new WeakPasswordException("weak password for " + dtoUser.getUsername());
-            }
+            throw new UserCreationFailedException(new UserAlreadyExistsException("User already exists: " + dtoUser.getUsername()));
         }
+        UserEntity userEntity = userMapper.toEntity(dtoUser);
+        userEntity.setPassword(passwordEncoder.encode(dtoUser.getPassword()));
+
+        UserEntity user;
+        try {
+            user = userRepository.save(userEntity);
+        } catch (RepositoryException ex) {
+            throw new UserCreationFailedException("failed to create user " + dtoUser.getUsername(), ex);
+        }
+        return userMapper.toDto(user);
     }
 
     public void deleteUser(Long userId) {
@@ -84,9 +76,5 @@ public class UserService {
         } catch (RepositoryException ex) {
             throw new UserDeletionFailedException("Cannot delete: repository failure for user " + userId, ex);
         }
-    }
-
-    private boolean checkPasswordStrength(String password){
-        return true;
     }
 }

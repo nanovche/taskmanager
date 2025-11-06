@@ -4,4 +4,7 @@ public class UserCreationFailedException extends RuntimeException{
     public UserCreationFailedException(String message, Throwable cause) {
         super(message, cause);
     }
+    public UserCreationFailedException(Throwable cause) {
+        super(cause);
+    }
 }
