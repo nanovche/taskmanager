@@ -1,5 +1,6 @@
-package com.example.taskmanager.exception;
+package com.example.taskmanager.exception.handlers;
 
+import com.example.taskmanager.exception.*;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

@@ -2,10 +2,7 @@ package com.example.taskmanager.service;
 
 import com.example.taskmanager.dto.UserDTO;
 import com.example.taskmanager.entity.UserEntity;
-import com.example.taskmanager.exception.NoSuchUserException;
-import com.example.taskmanager.exception.UserAlreadyExistsException;
-import com.example.taskmanager.exception.UserCreationException;
-import com.example.taskmanager.exception.WeakPasswordException;
+import com.example.taskmanager.exception.*;
 import com.example.taskmanager.mappers.UserMapper;
 import com.example.taskmanager.repository.UserRepository;
 import org.apache.commons.lang3.StringUtils;
@@ -70,17 +67,18 @@ public class UserService {
         }
     }
 
-    //change exception
     public void deleteUser(Long userId) {
 
         if (userId == null) {
             throw new IllegalArgumentException("userId is null");
         }
-         //change exception
+
         try {
             userRepository.deleteById(userId);
-        } catch (Exception ex) {
-            throw new NoSuchUserException(String.format("user with id %s does not exist - no user is deleted", userId), ex);
+        } catch (NoSuchUserException ex) {
+            throw new UserDeletionFailedException("Cannot delete: user not found (id=" + userId + ")", ex);
+        } catch (RepositoryException ex) {
+            throw new UserDeletionFailedException("Cannot delete: repository failure for user " + userId, ex);
         }
     }
 
