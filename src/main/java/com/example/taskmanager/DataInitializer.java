@@ -4,6 +4,7 @@ import com.example.taskmanager.entity.Authority;
 import com.example.taskmanager.entity.UserEntity;
 import com.example.taskmanager.repository.AuthorityRepository;
 import com.example.taskmanager.repository.UserRepository;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
@@ -18,6 +19,7 @@ public class DataInitializer implements CommandLineRunner {
     private final AuthorityRepository authorityRepository;
     private final PasswordEncoder passwordEncoder;
 
+    @Autowired
     public DataInitializer(UserRepository userRepository,
                            AuthorityRepository authorityRepository,
                            PasswordEncoder passwordEncoder) {

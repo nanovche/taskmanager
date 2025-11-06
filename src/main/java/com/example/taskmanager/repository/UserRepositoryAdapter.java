@@ -35,7 +35,7 @@ public class UserRepositoryAdapter implements UserRepository{
      */
     @Override
     public Optional<UserEntity> findByUsername(String username) {
-        return Optional.empty();
+        return userRepository.findByUsername(username);
     }
 
     /**
@@ -181,7 +181,12 @@ public class UserRepositoryAdapter implements UserRepository{
      */
     @Override
     public <S extends UserEntity> S save(S entity) {
-        return null;
+
+        try {
+            return userRepository.save(entity);
+        } catch (DataAccessException ex) {
+            throw new RepositoryException("Failed to save user " + entity.getUsername(), ex);
+        }
     }
 
     /**
