@@ -2,7 +2,7 @@ package com.example.taskmanager.service;
 
 import com.example.taskmanager.domain.SecurityUser;
 import com.example.taskmanager.entity.UserEntity;
-import com.example.taskmanager.repository.UserRepository;
+import com.example.taskmanager.repository.UserRepositoryAdapter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -12,10 +12,10 @@ import org.springframework.stereotype.Service;
 @Service
 public class JpaUserDetailsService implements UserDetailsService {
 
-    private final UserRepository userRepository;
+    private final UserRepositoryAdapter userRepository;
 
     @Autowired
-    public JpaUserDetailsService(UserRepository userRepository) {
+    public JpaUserDetailsService(UserRepositoryAdapter userRepository) {
         this.userRepository = userRepository;
     }
 
