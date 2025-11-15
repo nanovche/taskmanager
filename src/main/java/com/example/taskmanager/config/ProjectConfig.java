@@ -2,12 +2,14 @@ package com.example.taskmanager.config;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.retry.annotation.EnableRetry;
 import org.springframework.security.provisioning.JdbcUserDetailsManager;
 import org.springframework.web.client.RestTemplate;
 
 import javax.sql.DataSource;
 
 @Configuration
+@EnableRetry
 public class ProjectConfig {
 
     @Bean
