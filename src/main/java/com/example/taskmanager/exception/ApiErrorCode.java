@@ -6,5 +6,6 @@ public enum ApiErrorCode {
     USER_NOT_FOUND,
     INTERNAL_SERVER_ERROR,
     BAD_REQUEST,
-    UNKNOWN_ERROR
+    UNKNOWN_ERROR,
+    BAD_GATEWAY
 }

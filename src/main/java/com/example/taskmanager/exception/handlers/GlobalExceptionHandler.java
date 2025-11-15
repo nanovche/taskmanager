@@ -58,6 +58,25 @@ public class GlobalExceptionHandler {
         }
     }
 
+    @ExceptionHandler({
+            ExternalCommunicationException.class,
+            ExternalServiceUnavailableException.class
+    })
+    public ResponseEntity<Map<String, String>> handleExternalServiceServerException(ValidationException ex, HttpServletRequest request) {
+        Map<String, String> body = prepareCommonBodyData(ex, request);
+        body.put("error", ApiErrorCode.BAD_GATEWAY.name());
+        return ResponseEntity.status(HttpStatus.BAD_GATEWAY).body(body);
+    }
+
+    @ExceptionHandler({
+            ExternalServiceException.class,
+    })
+    public ResponseEntity<Map<String, String>> handleExternalServiceClientException(ValidationException ex, HttpServletRequest request) {
+        Map<String, String> body = prepareCommonBodyData(ex, request);
+        body.put("error", ApiErrorCode.BAD_REQUEST.name());
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(body);
+    }
+
     private Map<String, String> prepareCommonBodyData(Throwable ex, HttpServletRequest request){
 
         Map<String, String> body = new HashMap<>();
