@@ -1,10 +1,20 @@
 package com.example.taskmanager.exception;
 
 
+import org.springframework.http.HttpStatus;
+
 public class ExternalCommunicationException extends BaseAppException {
-    public ExternalCommunicationException(Throwable cause) {
-        super(cause);
+
+    @Override
+    public HttpStatus getHttpStatus() {
+        return HttpStatus.BAD_GATEWAY;
     }
+
+    @Override
+    public ApiErrorCode getErrorCode() {
+        return ApiErrorCode.BAD_GATEWAY;
+    }
+
     public ExternalCommunicationException(String message, Throwable cause) {
         super(message, cause);
     }

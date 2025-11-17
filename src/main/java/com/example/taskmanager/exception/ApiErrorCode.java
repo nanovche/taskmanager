@@ -7,5 +7,6 @@ public enum ApiErrorCode {
     INTERNAL_SERVER_ERROR,
     BAD_REQUEST,
     UNKNOWN_ERROR,
-    BAD_GATEWAY
+    BAD_GATEWAY,
+    WEAK_PASSWORD
 }

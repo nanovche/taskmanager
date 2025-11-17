@@ -1,6 +1,11 @@
 package com.example.taskmanager.exception;
 
-public class BaseAppException extends RuntimeException{
+import org.springframework.http.HttpStatus;
+
+public abstract class BaseAppException extends RuntimeException{
+
+    public abstract HttpStatus getHttpStatus();
+    public abstract ApiErrorCode getErrorCode();
 
     public BaseAppException(String message) {
         super(message);
