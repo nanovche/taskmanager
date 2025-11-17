@@ -16,8 +16,10 @@ public class UserCreationFailedException extends BaseAppException{
 
     public UserCreationFailedException(String message, Throwable cause) {
         super(message, cause);
+        setPublicMessage("Unable to create account.");
     }
     public UserCreationFailedException(Throwable cause) {
         super(cause);
+        setPublicMessage("Unable to create account.");
     }
 }

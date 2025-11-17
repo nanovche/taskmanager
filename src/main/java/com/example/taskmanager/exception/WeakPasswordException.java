@@ -16,5 +16,6 @@ public class WeakPasswordException extends BaseAppException {
 
     public WeakPasswordException(String message) {
         super(message);
+        setPublicMessage("Password does not meet security requirements.");
     }
 }

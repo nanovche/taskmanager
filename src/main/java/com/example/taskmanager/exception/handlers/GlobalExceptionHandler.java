@@ -20,7 +20,7 @@ public class GlobalExceptionHandler {
     private ErrorApiResponse buildApiErrorResponseData(BaseAppException ex, HttpServletRequest request){
         return new ErrorApiResponse(
                 ex.getErrorCode().name(),
-                ex.getMessage(),
+                ex.getPublicMessage(),
                 request.getRequestURI(),
                 new Date().toString());
     }

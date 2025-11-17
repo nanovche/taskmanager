@@ -17,5 +17,6 @@ public class UserAlreadyExistsException extends BaseAppException {
 
     public UserAlreadyExistsException(String message) {
         super(message);
+        setPublicMessage("Could not create account");
     }
 }
