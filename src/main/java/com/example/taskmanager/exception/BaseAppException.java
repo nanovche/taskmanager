@@ -7,6 +7,9 @@ public abstract class BaseAppException extends RuntimeException{
     public abstract HttpStatus getHttpStatus();
     public abstract ApiErrorCode getErrorCode();
 
+    public BaseAppException() {
+    }
+
     public BaseAppException(String message) {
         super(message);
     }
