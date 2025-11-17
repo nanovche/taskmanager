@@ -16,5 +16,6 @@ public class ExternalServiceException extends BaseAppException {
 
     public ExternalServiceException(String message, Throwable cause) {
         super(message, cause);
+        setPublicMessage("Unable to complete the request due to invalid input.");
     }
 }

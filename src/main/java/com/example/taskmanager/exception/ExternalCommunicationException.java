@@ -17,5 +17,6 @@ public class ExternalCommunicationException extends BaseAppException {
 
     public ExternalCommunicationException(String message, Throwable cause) {
         super(message, cause);
+        setPublicMessage("Unable to complete the request due to network issues. Please try again later.");
     }
 }
