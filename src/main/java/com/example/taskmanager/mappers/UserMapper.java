@@ -5,7 +5,6 @@ import com.example.taskmanager.entity.Authority;
 import com.example.taskmanager.entity.UserEntity;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 
 import java.util.Arrays;
 import java.util.Set;
