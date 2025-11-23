@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Select Quarter</title>
+</head>
+<body>
+
+<h2>Select a Quarter</h2>
+
+<form th:action="@{/select-quarter}" method="post">
+    <label for="quarterId">Quarter ID:</label>
+    <input type="text" id="quarterId" name="quarterId" />
+
+    <button type="submit">Submit</button>
+</form>
+
+</body>
+</html>

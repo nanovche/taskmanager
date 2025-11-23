@@ -1,12 +1,15 @@
 package com.example.taskmanager.integrations.econt.controllers;
 
+import com.example.taskmanager.dto.QuarterEcontApiResponseDto;
+import com.example.taskmanager.dto.QuartersRequestDto;
 import com.example.taskmanager.integrations.econt.services.EcontApiService;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
+import org.springframework.validation.annotation.Validated;
+import org.springframework.web.bind.annotation.*;
 
-@RestController
+@Controller
 @RequestMapping("/api/econt")
 public class EcontController {
 
@@ -16,8 +19,15 @@ public class EcontController {
         this.econtApiService = econtApiService;
     }
 
-    @GetMapping(path = "/offices")
-    public ResponseEntity<Object> getOffices(){
-        return econtApiService.getOffices();
+    @PostMapping(path = "/quarters")
+    public String getQuarters(@RequestParam @Validated Long cityID, Model model){
+        QuarterEcontApiResponseDto quartersForCity = econtApiService.getQuartersForCity(cityID);
+        model.addAttribute("quarters", quartersForCity.getQuarterList());
+        return "econt/econt-page";
+    }
+
+    @GetMapping(path = "/select-quarter")
+    public String render(){
+        return "econt/select-quarter";
     }
 }

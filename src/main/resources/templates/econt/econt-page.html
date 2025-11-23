@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <title>Quarters</title>
+</head>
+<body>
+
+<h2>Quarters</h2>
+
+<table>
+    <thead>
+    <tr>
+        <th>Quarter ID</th>
+        <th>Quarter</th>
+        <th>Name EN</th>
+    </tr>
+    </thead>
+    <tbody>
+    <tr th:each="q : ${quarters}">
+        <td th:text="${q.quarterId}"></td>
+        <td th:text="${q.quarter}"></td>
+        <td th:text="${q.quarterNameInEnglish}"></td>
+    </tr>
+    </tbody>
+</table>
+
+</body>
+</html>
