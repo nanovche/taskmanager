@@ -1,18 +1,19 @@
 package com.example.taskmanager.integrations.econt.services;
 
 import com.example.taskmanager.dto.QuarterEcontApiResponseDto;
+import com.example.taskmanager.dto.QuartersRequestDto;
 import com.example.taskmanager.exception.ExternalCommunicationException;
 import com.example.taskmanager.exception.ExternalServiceException;
 import com.example.taskmanager.exception.ExternalServiceUnavailableException;
 import com.example.taskmanager.integrations.econt.configuration.EcontProperties;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.retry.annotation.Backoff;
 import org.springframework.retry.annotation.Retryable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.*;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.logging.Logger;
 
 
@@ -37,12 +38,13 @@ public class EcontApiService {
                 econtProperties.getBaseUrl(),
                 econtProperties.getServices().getNomenclatures(),
                 econtProperties.getFormat());
+
         try {
-            ResponseEntity<QuarterEcontApiResponseDto> apiResponse = restTemplate.postForEntity(
+            ResponseEntity<QuarterEcontApiResponseDto> apiResponse = restTemplate.exchange(
                     url,
-                    cityId,
-                    QuarterEcontApiResponseDto.class,
-                    prepareHeaders());
+                    HttpMethod.POST,
+                    new HttpEntity<>(new QuartersRequestDto(cityId), prepareHeaders()),
+                    QuarterEcontApiResponseDto.class);
             return apiResponse.getBody();
         } catch (HttpClientErrorException e) {
             // 400-level errors (bad request, unauthorized, not found, etc.)
